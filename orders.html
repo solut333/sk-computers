@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos - Admin</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container py-4">
+<a href="admin.html" class="btn btn-link">&larr; Voltar</a>
+<h4>Pedidos</h4>
+<div id="ordersList" class="mt-3"></div>
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+
+auth.onAuthStateChanged(async user =>{
+if(!user) return window.location='login.html';
+const doc = await db.collection('admins').doc(user.uid).get(); if(!doc.exists){ alert('Acesso negado'); auth.signOut(); return window.location='login.html'; }
+const res = await db.collection('orders').orderBy('createdAt','desc').get(); const out = document.getElementById('ordersList'); out.innerHTML=''; res.forEach(d=>{ const o=d.data(); out.innerHTML += `<div class="card mb-2 p-2"><div class="d-flex justify-content-between"><div><strong>Pedido ${d.id}</strong><div class='small text-muted'>${o.userEmail}</div></div><div><div>Total: R$ ${o.total.toFixed(2)}</div><div class='small text-muted'>${o.status||'pendente'}</div></div></div><div class='mt-2'>`+ o.items.map(it=>`<div class='small'>- ${it.title} x ${it.qty}</div>`).join('') + `</div></div>`; });
+});
+</script>
+</body>
+</html>

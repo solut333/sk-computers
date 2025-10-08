@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin - SK COMPUTERS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container py-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h3>Painel Admin</h3>
+<div>
+<a href="add_product.html" class="btn btn-primary">Adicionar Produto</a>
+<a href="orders.html" class="btn btn-outline-secondary">Pedidos</a>
+<button id="adminLogout" class="btn btn-danger">Sair</button>
+</div>
+</div>
+
+
+<div id="adminProducts" class="row g-3"></div>
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+
+// Redirect to login if not admin
+auth.onAuthStateChanged(async user =>{
+if(!user) return window.location = 'login.html';
+const doc = await db.collection('admins').doc(user.uid).get();
+if(!doc.exists){ alert('Acesso negado: usuário não é admin'); auth.signOut(); return window.location='login.html'; }
+loadProducts();
+});
+
+
+async function loadProducts(){
+const res = await db.collection('products').get();
+const container = document.getElementById('adminProducts'); container.innerHTML='';
+res.forEach(d=>{
+const p = d.data();
+container.innerHTML += `
+<div class="col-md-4">
+<div class="card p-2">
+<img src="${p.img}" class="card-img-top" style="height:160px;object-fit:cover" />
+<div class="card-body">
+<h5>${p.title}</h5>
+<p class="small text-muted">${p.socket} • R$ ${p.price}</p>
+<div class="d-flex gap-2">
+<a href="add_product.html?id=${d.id}" class="btn btn-sm btn-outline-primary">Editar</a>
+<button class="btn btn-sm btn-outline-danger" onclick="deleteProduct('${d.id}')">Excluir</button>
+</div>
+</div>
+</div>
+</div>`;
+});
+}
+
+
+async function deleteProduct(id){ if(!confirm('Excluir produto?')) return; await db.collection('products').doc(id).delete(); loadProducts(); }
+
+
+document.getElementById('adminLogout').addEventListener('click', ()=>{ auth.signOut(); window.location='login.html'; });
+</script>
+</body>
+</html>
