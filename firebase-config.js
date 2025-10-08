@@ -1,11 +1,7 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Se o SDK for carregado via CDN (compat.js), não use 'import'.
+// A variável 'firebase' já estará disponível globalmente.
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Seus dados de configuração
 const firebaseConfig = {
   apiKey: "AIzaSyDdigHfvpP5ya5WYRWukCBn-IkGNlvIbXs",
   authDomain: "hell-lost.firebaseapp.com",
@@ -17,6 +13,12 @@ const firebaseConfig = {
   measurementId: "G-F54KHB6107"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// Inicialize o Firebase usando a sintaxe global 'firebase'
+// Esta linha torna o objeto 'firebase' utilizável em todo o seu código.
+const app = firebase.initializeApp(firebaseConfig);
+
+// Opcionalmente, se você usar Analytics, inicialize assim (mas não é obrigatório para o login)
+// const analytics = firebase.analytics(); 
+
+// Nota: A inicialização das instâncias de 'auth' e 'firestore' deve vir no seu 'login.html'
+// APÓS o carregamento deste script, como já fizemos no código anterior.
