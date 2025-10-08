@@ -1,47 +1,75 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Entrar - SK COMPUTERS</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - SK COMPUTERS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body class="bg-light">
-<div class="container py-5">
-<div class="row justify-content-center">
-<div class="col-md-5">
-<div class="card p-4">
-<h4 class="mb-3">Entrar</h4>
-<form id="loginForm">
-<input type="email" id="loginEmail" class="form-control mb-2" placeholder="E-mail" required>
-<input type="password" id="loginPass" class="form-control mb-3" placeholder="Senha" required>
-<button class="btn btn-primary w-100">Entrar</button>
-</form>
-<div class="mt-3 text-center"><a href="register.html">Criar conta</a></div>
-<div id="loginMsg" class="mt-2 text-danger small"></div>
-</div>
-</div>
-</div>
-</div>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card p-4">
+                    <h4 class="mb-4 text-center text-primary">Acesso de Usuário</h4>
+                    
+                    <form id="loginForm">
+                        <input type="email" id="loginEmail" class="form-control mb-2 rounded-lg" placeholder="E-mail" required>
+                        <input type="password" id="loginPass" class="form-control mb-3 rounded-lg" placeholder="Senha" required>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Entrar</button>
+                    </form>
+                    
+                    <div class="mt-3 text-center">
+                        <a href="register.html" class="text-decoration-none">Ainda não tem conta? Crie uma aqui!</a>
+                    </div>
+                    
+                    <div id="loginMsg" class="mt-3 text-danger small text-center fw-bold"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script type="module" src="firebase-config.js"></script>
-<script>
-const auth = firebase.auth();
-document.getElementById('loginForm').addEventListener('submit', async (e)=>{
-e.preventDefault();
-const email = document.getElementById('loginEmail').value;
-const pass = document.getElementById('loginPass').value;
-try{
-await auth.signInWithEmailAndPassword(email, pass);
-window.location = 'index.html';
-}catch(err){ document.getElementById('loginMsg').innerText = err.message; }
-});
-</script>
-</body>
+    <script src="firebase-config.js"></script>
 
-</html>
+    <script>
+        const auth = firebase.auth();
+        const loginForm = document.getElementById('loginForm');
+        const loginMsg = document.getElementById('loginMsg');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            loginMsg.innerText = ''; 
+
+            try {
+
+                await auth.signInWithEmailAndPassword(email, pass);
+
+                window.location.href = 'index.html';
+
+            } catch (err) {
+                console.error("Erro de Autenticação:", err.code, err.message);
+
+                let msgAmigavel = 'Ocorreu um erro desconhecido. Tente novamente.';
+
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+                    msgAmigavel = 'Credenciais inválidas. Verifique seu e-mail e senha.';
+                } else if (err.code === 'auth/invalid-email') {
+                    msgAmigavel = 'O formato do e-mail é inválido.';
+                } else if (err.code === 'auth/too-many-requests') {
+                    msgAmigavel = 'Muitas tentativas de login. Tente novamente mais tarde.';
+                }
