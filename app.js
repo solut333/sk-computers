@@ -281,6 +281,9 @@ window.handleLogout = async function() {
     try {
         if (cartUnsubscribe) cartUnsubscribe(); // Para de ouvir o carrinho
         await auth.signOut();
+        showNotification("Você saiu da sua conta.", false);
+        // Redirecionamento explícito para a página de login após o logout
+        window.location.href = 'login.html'; 
     } catch (error) {
         console.error("Erro ao fazer logout:", error);
         showNotification("Falha ao sair. Tente novamente.", true);
@@ -322,8 +325,8 @@ function updateNavUI(user) {
         
         // Se o usuário não está logado, tenta o login anônimo ou redireciona.
         if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
-            // Tenta logar anonimamente ou com token, para poder usar o Firestore anonimamente
-            // Se falhar, o sistema Auth fará o redirecionamento quando necessário (ex: ao tentar checkout)
+            // Se a página é index.html e não há usuário, ele será redirecionado se tentar uma ação protegida,
+            // ou pode ser que o próprio index.html tenha um script de redirecionamento.
         }
     }
     
@@ -351,16 +354,7 @@ function initializeApp() {
         } else {
             updateNavUI(null);
 
-            // Se deslogado, tenta logar anonimamente para permitir a navegação (caso não haja token)
-            try {
-                 if (initialAuthToken) {
-                    await auth.signInWithCustomToken(initialAuthToken);
-                } else if (!auth.currentUser) {
-                    await auth.signInAnonymously();
-                }
-            } catch(e) {
-                console.warn("Falha no login anônimo/token, operando sem autenticação completa.", e);
-            }
+            // A lógica de login automático anônimo/token foi removida daqui para evitar conflitos de estado pós-logout.
         }
         
         // Carrega produtos e renderiza o carrinho APENAS após a primeira checagem de auth
