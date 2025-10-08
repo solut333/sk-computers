@@ -331,8 +331,20 @@ function updateNavUI(user) {
 }
 
 
-// --- MAIN AUTHENTICATION LISTENER ---
-if (auth) {
+// --- MAIN APPLICATION STARTUP ---
+
+// Flag para garantir que o carregamento inicial dos dados ocorra apenas uma vez.
+let initialLoadComplete = false;
+
+/**
+ * Função principal para inicializar listeners e carregar dados.
+ */
+function initializeApp() {
+    if (!auth) {
+        console.error("Firebase Auth não está disponível. Verifique o firebase-config.js e CDNs.");
+        return;
+    }
+    
     auth.onAuthStateChanged(async (user) => {
         if (user) {
             updateNavUI(user);
@@ -351,16 +363,15 @@ if (auth) {
             }
         }
         
-        // Executa a lógica da loja após a resolução do estado de autenticação
-        window.onload = function() {
+        // Carrega produtos e renderiza o carrinho APENAS após a primeira checagem de auth
+        if (!initialLoadComplete) {
             loadProducts();
             renderCartPage();
-        };
+            initialLoadComplete = true;
+        }
     });
-} else {
-    // Fallback: Tenta carregar os produtos mesmo sem Firebase totalmente pronto 
-    window.onload = function() {
-        loadProducts();
-        renderCartPage();
-    };
 }
+
+// Garante que o initialization do Firebase (app.js) comece após o DOM estar pronto e scripts carregados.
+// Isso substitui a chamada direta no final do script e evita conflitos.
+window.onload = initializeApp;
