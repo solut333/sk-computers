@@ -1,0 +1,5 @@
+{
+"buildCommand": "sed -i "s|PLACEHOLDER_V_FIREBASE_API_KEY|$V_FIREBASE_API_KEY|g; s|PLACEHOLDER_V_FIREBASE_AUTH_DOMAIN|$V_FIREBASE_AUTH_DOMAIN|g; s|PLACEHOLDER_V_FIREBASE_PROJECT_ID|$V_FIREBASE_PROJECT_ID|g" firebase-config.js",
+"outputDirectory": ".",
+"installCommand": "npm install"
+}
