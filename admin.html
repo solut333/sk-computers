@@ -27,12 +27,14 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script type="module" src="js/admin.js"></script>
+
 <script>
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// Redirect to login if not admin
+
 auth.onAuthStateChanged(async user =>{
 if(!user) return window.location = 'login.html';
 const doc = await db.collection('admins').doc(user.uid).get();
